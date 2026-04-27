@@ -1,0 +1,19 @@
+{
+  "name": "sentinel-enhanced-simulator",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.1.1",
+    "dotenv": "^16.4.5",
+    "axios": "^1.6.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # AI Weather Service (Route Analysis)
+  weather-service:
+    build: ./services/weather-service
+    ports:
+      - "${PORT_WEATHER_SERVICE:-8080}:8080"
+    environment:
+      - GOOGLE_WEATHER_API_KEY=${GOOGLE_WEATHER_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - NEXT_PUBLIC_FIREBASE_DATABASE_URL=${NEXT_PUBLIC_FIREBASE_DATABASE_URL}
+    volumes:
+      - ./google-credentials.json:/app/google-credentials.json
+
+  # AI Risk Engine (Assessment & Rerouting)
+  risk-engine:
+    build: ./services/risk-engine
+    ports:
+      - "${PORT_RISK_ENGINE:-8081}:8081"
+    environment:
+      - WEATHER_SERVICE_URL=http://weather-service:8080
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - NEXT_PUBLIC_FIREBASE_DATABASE_URL=${NEXT_PUBLIC_FIREBASE_DATABASE_URL}
+    volumes:
+      - ./google-credentials.json:/app/google-credentials.json
+    depends_on:
+      - weather-service
+
+  # Inventory Service (Stock Management)
+  inventory-service:
+    build: ./services/inventory-service
+    ports:
+      - "${PORT_INVENTORY_SERVICE:-8082}:8082"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - NEXT_PUBLIC_FIREBASE_DATABASE_URL=${NEXT_PUBLIC_FIREBASE_DATABASE_URL}
+    volumes:
+      - ./google-credentials.json:/app/google-credentials.json
+
+  # Warehouse Service (Hub Operations)
+  warehouse-service:
+    build: ./services/warehouse-service
+    ports:
+      - "${PORT_WAREHOUSE_SERVICE:-8083}:8083"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - NEXT_PUBLIC_FIREBASE_DATABASE_URL=${NEXT_PUBLIC_FIREBASE_DATABASE_URL}
+    volumes:
+      - ./google-credentials.json:/app/google-credentials.json
+
+  # Vendor Service (Partner Scorecards)
+  vendor-service:
+    build: ./services/vendor-service
+    ports:
+      - "${PORT_VENDOR_SERVICE:-8084}:8084"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+      - NEXT_PUBLIC_FIREBASE_DATABASE_URL=${NEXT_PUBLIC_FIREBASE_DATABASE_URL}
+    volumes:
+      - ./google-credentials.json:/app/google-credentials.json
+
+  # Supply Chain Simulator
+  simulator:
+    build: ./services/simulator
+    environment:
+      - NEXT_PUBLIC_FIREBASE_DATABASE_URL=${NEXT_PUBLIC_FIREBASE_DATABASE_URL}
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+    volumes:
+      - ./google-credentials.json:/app/google-credentials.json
+    depends_on:
+      - weather-service
+      - risk-engine
+
+  # Next.js 14 Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY}
+      - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+      - NEXT_PUBLIC_FIREBASE_DATABASE_URL=${NEXT_PUBLIC_FIREBASE_DATABASE_URL}
+      - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+      - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+      - NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID}
+      - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+      - WEATHER_SERVICE_URL=http://weather-service:8080
+      - RISK_ENGINE_URL=http://risk-engine:8081
+    depends_on:
+      - risk-engine
