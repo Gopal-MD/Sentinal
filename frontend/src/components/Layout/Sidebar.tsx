@@ -18,7 +18,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Truck, label: "Shipments", href: "/shipments" },
   { icon: Package, label: "Inventory", href: "/inventory" },
   { icon: Warehouse, label: "Warehouse", href: "/warehouse" },
@@ -38,7 +38,11 @@ export default function Sidebar() {
       collapsed ? "w-20" : "w-64"
     )}>
       <div className="p-6 flex items-center justify-between">
-        {!collapsed && <span className="font-bold text-xl tracking-tight">SENTINEL</span>}
+        {!collapsed && (
+          <Link href="/dashboard" className="font-bold text-xl tracking-tight">
+            SENTINEL
+          </Link>
+        )}
         <button onClick={() => setCollapsed(!collapsed)} className="p-1 hover:bg-slate-800 rounded">
           {collapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
         </button>
